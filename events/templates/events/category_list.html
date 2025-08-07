@@ -1,0 +1,28 @@
+{% extends 'navbar.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-xl font-bold mb-4">Category List</h2>
+    <a href="{% url 'category_create' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block">Add Category</a>
+    <table class="table-auto w-full">
+        <thead>
+            <tr>
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td class="border px-4 py-2">{{ category.name }}</td>
+                <td class="border px-4 py-2">
+                    <a href="{% url 'category_update' category.pk %}" class="text-blue-500 mr-2">Edit</a>
+                    <a href="{% url 'category_delete' category.pk %}" class="text-red-500">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2" class="text-center">No categories found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

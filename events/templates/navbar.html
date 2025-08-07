@@ -1,0 +1,27 @@
+<!-- templates/base.html -->
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Event Management{% endblock %}</title>
+    <link rel="stylesheet" href="{% static "css/output.css" %}">
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+        <div class="text-3xl font-bold">Event Management System</div>
+        <ul class="flex gap-6">
+            <li><a href="{% url 'event_list' %}" class="font-semibold text-xl hover:text-black">All Events</a></li>
+            <li><a href="{% url 'event_create' %}" class="font-semibold text-xl hover:text-black">Add Event</a></li>
+            <li><a href="{% url 'participant_create' %}" class="font-semibold text-xl hover:text-black">Add Participant</a></li>
+            <li><a href="{% url 'category_list' %}" class="font-semibold text-xl hover:text-black">Categories</a></li>
+            <li><a href="{% url 'dashboard' %}" class="font-semibold text-xl hover:text-black">Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto mt-6 px-4">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
