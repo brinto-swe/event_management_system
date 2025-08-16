@@ -1,76 +1,43 @@
 from django import forms
-from .models import Event, Participant, Category
-from django.core.exceptions import ValidationError
-from django.utils import timezone
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UsernameField
+from .models import Event, Category
 
+class SignUpForm(forms.ModelForm):
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
-class CategoryForm(forms.ModelForm):
     class Meta:
-        model = Category
-        fields = ['name', 'description']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'Class':' border-solid border-2 border-zinc-500 p-2 rounded',
-                'placeholder': 'Enter category name'}),
-            'description': forms.Textarea(attrs={'Class':'border-solid border-2 border-zinc-500 p-2 rounded','rows': 3}),
-        }
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name')
+        field_classes = {'username': UsernameField}
 
+    def clean(self):
+        cleaned = super().clean()
+        p1, p2 = cleaned.get('password1'), cleaned.get('password2')
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError("Passwords do not match.")
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password1'])
+        user.is_active = False 
+        
+        if commit:
+            user.save()
+        return user
 
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'description', 'date', 'time', 'location', 'category']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
-            'description': forms.Textarea(attrs={
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
-            'date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
-            'time': forms.TimeInput(attrs={
-                'type': 'time',
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
-            'location': forms.TextInput(attrs={
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
-            'category': forms.Select(attrs={
-                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
-            }),
+        fields = ['name','description','date','time','location','category','image']
+        widget = {
+            'date':forms.SelectDateWidget,
+            'time': forms.TimeInput(attrs={'class': 'time-picker-input'})
         }
 
-    def clean_date(self):
-        date = self.cleaned_data.get('date')
-        if date < timezone.now().date():
-            raise ValidationError("Event date cannot be in the past.")
-        return date
-
-
-class ParticipantForm(forms.ModelForm):
-    events = forms.ModelMultipleChoiceField(
-        queryset=Event.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
-    
-
+class CategoryForm(forms.ModelForm):
     class Meta:
-        model = Participant
-        fields = ['name', 'email', 'events']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'Class':'border-solid border-2 border-zinc-500 p-2 rounded', 'placeholder':'Enter participant name'
-            }),
-            'email': forms.EmailInput(attrs={
-                'Class':'border-solid border-2 border-zinc-500 p-2 rounded', 'placeholder': 'example@email.com'}),
-        }
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if Participant.objects.filter(email=email).exists():
-            raise ValidationError("This email is already registered.")
-        return email
+        model = Category
+        fields = ['name','description']

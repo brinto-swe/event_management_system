@@ -1,26 +1,41 @@
-{% extends 'navbar.html' %}
+{% extends 'base.html' %}
+{% load custom_tags %}
+
 {% block title %}Events{% endblock %}
+
 {% block content %}
+<div class="flex items-center justify-between mb-4">
+  <form method="get" class="flex gap-2">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by name or location" class="border rounded p-2" />
+    
+    <select name="category" class="border rounded p-2">
+      <option value="">All Categories</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}" {% if request.GET.category|stringformat:'s' == c.id|stringformat:'s' %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
 
-<h2 class="text-2xl font-semibold mb-4">All Events</h2>
+    <input type="date" name="from" value="{{ request.GET.from }}" class="border rounded p-2" />
+    <input type="date" name="to" value="{{ request.GET.to }}" class="border rounded p-2" />
+    <button class="px-4 py-2 bg-blue-600 text-white rounded">Filter</button>
+  </form>
 
-<!-- Search -->
-<form method="get" class="mb-6">
-    <input type="text" name="query" placeholder="Search by name or location" class="px-3 py-2 border rounded w-64">
-    <button type="submit" class="ml-2 bg-blue-600 text-white px-4 py-2 rounded">Search</button>
-</form>
+  {% if can_add_event %}
+    <a href="{% url 'event_add' %}" class="px-3 py-2 bg-green-600 text-white rounded">Add Event</a>
+  {% endif %}
+</div>
 
-<!-- Events -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for event in events %}
-    <div class="bg-white p-4 shadow rounded">
-        <h3 class="text-xl font-bold mb-1">{{ event.name }}</h3>
-        <p class="text-sm text-gray-600 mb-2">Category: {{ event.category.name }}</p>
-        <p class="text-sm">Participants: {{ event.participant_set.count }}</p>
-        <a href="{% url 'event_detail' event.id %}" class="mt-2 inline-block text-blue-600 hover:underline">View Details</a>
+<div class="grid md:grid-cols-3 gap-4">
+  {% for e in events %}
+    <div class="bg-white rounded shadow p-3 hover:bg-gray-100 cursor-pointer" onclick="window.location='{% url 'event_detail' e.id %}'">
+      <img src="{{ e.image.url }}" alt="" class="w-full h-40 object-cover rounded mb-2" />
+      <h2 class="text-lg font-semibold hover:underline">{{ e.name }}</h2>
+      <p class="text-sm text-gray-600">{{ e.category.name }} • {{ e.date }} {{ e.time }}</p>
+      <p class="text-sm text-gray-600">Participants: {{ e.participant_count }}</p>
+      <p class="text-sm">{{ e.location }}</p>
     </div>
-    {% empty %}
+  {% empty %}
     <p>No events found.</p>
-    {% endfor %}
+  {% endfor %}
 </div>
 {% endblock %}

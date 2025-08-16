@@ -1,28 +1,30 @@
-{% extends 'navbar.html' %}
+{% extends 'base.html' %}
+{% block title %}Categories{% endblock %}
 {% block content %}
-<div class="container mx-auto px-4 py-6">
-    <h2 class="text-xl font-bold mb-4">Category List</h2>
-    <a href="{% url 'category_create' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block">Add Category</a>
-    <table class="table-auto w-full">
-        <thead>
-            <tr>
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for category in categories %}
-            <tr>
-                <td class="border px-4 py-2">{{ category.name }}</td>
-                <td class="border px-4 py-2">
-                    <a href="{% url 'category_update' category.pk %}" class="text-blue-500 mr-2">Edit</a>
-                    <a href="{% url 'category_delete' category.pk %}" class="text-red-500">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="2" class="text-center">No categories found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold">Categories</h1>
+  <a href="{% url 'category_add' %}" class="px-3 py-2 bg-green-600 text-white rounded">Add Category</a>
 </div>
+<table class="w-full bg-white rounded shadow">
+  <thead><tr class="text-left">
+    <th class="p-3">Name</th><th class="p-3">Description</th><th class="p-3">Events</th><th class="p-3">Actions</th>
+  </tr></thead>
+  <tbody>
+    {% for c in categories %}
+      <tr class="border-t">
+        <td class="p-3">{{ c.name }}</td>
+        <td class="p-3">{{ c.description|default:"—" }}</td>
+        <td class="p-3">{{ c.event_count }}</td>
+        <td class="p-3 space-x-2">
+          <a class="px-2 py-1 bg-amber-600 text-white rounded" href="{% url 'category_edit' c.id %}">Edit</a>
+          <form method="post" action="{% url 'category_delete' c.id %}" class="inline">{% csrf_token %}
+            <button class="px-2 py-1 bg-red-600 text-white rounded">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td class="p-3" colspan="4">No categories.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

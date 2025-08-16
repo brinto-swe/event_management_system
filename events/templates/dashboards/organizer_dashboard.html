@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}
+  Organizer Dashboard
+{% endblock %}
+
+{% block content %}
+  <h1 class="text-xl font-semibold mb-4">Organizer Dashboard</h1>
+
+  <div class="grid md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-4 rounded shadow">
+      Total Events: <b>{{ stats.total_events }}</b>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      Upcoming: <b>{{ stats.upcoming_events }}</b>
+    </div>
+    <div class="bg-white p-4 rounded shadow">
+      Past: <b>{{ stats.past_events }}</b>
+    </div>
+  </div>
+
+  <h2 class="font-semibold mb-2">Today’s Events</h2>
+  <ul class="bg-white rounded shadow divide-y mb-6">
+    {% for e in todays_events %}
+      <li class="p-3 flex justify-between items-center">
+        <span>{{ e.name }} — {{ e.category.name }} ({{ e.participant_count }} participants)</span>
+        <div class="space-x-2">
+          <a href="{% url 'event_edit' e.id %}" class="px-2 py-1 bg-amber-600 text-white rounded">Edit</a>
+          <form method="post" action="{% url 'event_delete' e.id %}" class="inline">
+            {% csrf_token %}
+            <button class="px-2 py-1 bg-red-600 text-white rounded">Delete</button>
+          </form>
+        </div>
+      </li>
+    {% empty %}
+      <li class="p-3">No events today.</li>
+    {% endfor %}
+  </ul>
+
+  <h2 class="font-semibold mb-2">Manage Categories</h2>
+  <a href="{% url 'category_add' %}" class="px-3 py-2 bg-green-600 text-white rounded mb-3 inline-block">Add Category</a>
+  <table class="w-full bg-white rounded shadow">
+    <thead>
+      <tr class="text-left">
+        <th class="p-3">Name</th>
+        <th class="p-3">Description</th>
+        <th class="p-3">Events</th>
+        <th class="p-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in categories %}
+        <tr class="border-t">
+          <td class="p-3">{{ c.name }}</td>
+          <td class="p-3">{{ c.description|default:'—' }}</td>
+          <td class="p-3">{{ c.event_count }}</td>
+          <td class="p-3 space-x-2">
+            <a href="{% url 'category_edit' c.id %}" class="px-2 py-1 bg-amber-600 text-white rounded">Edit</a>
+            <form method="post" action="{% url 'category_delete' c.id %}" class="inline">
+              {% csrf_token %}
+              <button class="px-2 py-1 bg-red-600 text-white rounded">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td class="p-3" colspan="4">No categories.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
