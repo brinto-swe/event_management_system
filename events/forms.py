@@ -4,13 +4,26 @@ from django.contrib.auth.forms import UsernameField
 from .models import Event, Category
 
 class SignUpForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter your password'}))
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Re-enter your password'}))
 
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name')
         field_classes = {'username': UsernameField}
+        
+        widgets={
+            'username':forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter an username'}), 
+            'email':forms.EmailInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter you email (Example@mail.com)'}), 
+            'first_name':forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter you first name'}), 
+            'last_name':forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 mb-4 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter you last name'})
+        }
 
     def clean(self):
         cleaned = super().clean()
@@ -32,12 +45,38 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['name','description','date','time','location','category','image']
-        widget = {
-            'date':forms.SelectDateWidget,
-            'time': forms.TimeInput(attrs={'class': 'time-picker-input'})
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter an Event name'}),
+            
+            'description':forms.Textarea(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Give some description about event'}),
+            
+            'date':forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300',
+            }),
+            'time': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
+            }),
+            'location': forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300' , 'placeholder':'Give Event Location'
+            }),
+            'category': forms.Select(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300'
+            }),
         }
 
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name','description']
+        widgets ={
+            'name': forms.TextInput(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Enter an Category name'
+            }),
+            'decription':forms.Textarea(attrs={
+                'class': 'w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300', 'placeholder':'Give some description about Category'
+            }),
+        }

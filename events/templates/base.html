@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,23 +10,23 @@
     </title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <!-- Tailwind CDN (dev only) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static "css/output.css" %}">
   </head>
   <body class="bg-gray-50">
     <nav class="bg-white shadow">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="{% url 'event_list' %}" class="font-bold">Event Management System</a>
+      <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+        <a href="{% url 'event_list' %}" class="text-3xl font-bold">Event Management System</a>
         <div class="space-x-4">
-          <a href="{% url 'event_list' %}" class="text-sm">Events</a>
+          <a href="{% url 'event_list' %}" class="font-semibold text-xl hover:text-black">Events</a>
           {% if user.is_authenticated %}
-            <a href="{% url 'post_login_redirect' %}" class="text-sm">Dashboard</a>
+            <a href="{% url 'post_login_redirect' %}" class="font-semibold text-xl hover:text-black">Dashboard</a>
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
-              <button type="submit" class="text-sm">Logout</button>
+              <button type="submit" class="font-semibold text-xl hover:text-black">Logout</button>
             </form>
           {% else %}
-            <a href="{% url 'login' %}" class="text-sm">Login</a>
-            <a href="{% url 'signup' %}" class="text-sm">Signup</a>
+            <a href="{% url 'login' %}" class="font-semibold text-xl hover:text-black">Login</a>
+            <a href="{% url 'signup' %}" class="font-semibold text-xl hover:text-black">Signup</a>
           {% endif %}
         </div>
       </div>
