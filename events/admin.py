@@ -1,6 +1,18 @@
 from django.contrib import admin
-from .models import Category, Event, RSVP
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser, Category, Event, RSVP
 
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('profile_picture', 'phone_number')}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('profile_picture', 'phone_number')}),
+    )
+
+# আগের register করা অংশ
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')

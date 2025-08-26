@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-semibold mb-4">My Profile</h2>
+  <p><b>Username:</b> {{ user.username }}</p>
+  <p><b>Full Name:</b> {{ user.get_full_name }}</p>
+  <p><b>Email:</b> {{ user.email }}</p>
+  <p><b>Role:</b> {{ user.role|default:'Participant' }}</p>
+
+  <div class="mt-4 space-x-2">
+    <a href="{% url 'edit_profile' %}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Edit Profile</a>
+    <a href="{% url 'password_change' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Change Password</a>
+  </div>
+</div>
+{% endblock %}

@@ -18,6 +18,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com', 'http://127.0.0.1:8000']
 
+AUTH_USER_MODEL = "events.CustomUser"
+
 
 # Application definition
 
@@ -143,7 +145,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Auth redirects
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'post_login_redirect' 
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = '/'
 
 # Email (dev safe)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

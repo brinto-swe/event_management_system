@@ -1,5 +1,5 @@
 {% load static %}
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
     </title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <!-- Tailwind CDN (dev only) -->
-    <link rel="stylesheet" href="{% static "css/output.css" %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}" />
   </head>
   <body class="bg-gray-50">
     <nav class="bg-white shadow">
@@ -49,5 +49,81 @@
 
       {% endblock %}
     </div>
+  </body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}
+        EventMS
+      {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}" />
+    <!-- Tailwind / Bootstrap / custom CSS যোগ করতে পারো -->
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+      <div class="bg-indigo-600 px-20 p-4 text-white flex justify-between items-center">
+        <a href="{% url 'home' %}" class="text-xl font-bold text-white">Event Management System</a>
+
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'event_list' %}" class="font-semibold text-xl hover:text-black">Events</a>
+          {% if user.is_authenticated %}
+            <!-- Dashboard link (optional) -->
+            <a href="{% url 'post_login_redirect' %}" class="font-semibold text-xl hover:text-black">Dashboard</a>
+
+            <!-- Profile Dropdown -->
+            <div class="relative inline-block text-left">
+              <button id="profileDropdownButton" class="flex items-center justify-center flex-col focus:outline-none">
+                {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" alt="Profile" class="w-8 h-8 rounded-full object-cover" />
+                {% else %}
+                  <img src="{% static 'images/default_profile.png' %}" alt="Profile" class="w-8 h-8 rounded-full object-cover" />
+                {% endif %}
+                <span class="font-semibold text-sm hover:text-black">{{ user.username }}</span>
+              </button>
+              <div id="profileDropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10">
+                <a href="{% url 'profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Profile</a>
+                <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Edit Profile</a>
+                <li>
+                  <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</button>
+                  </form>
+                </li>
+              </div>
+            </div>
+
+            <script>
+              // Simple dropdown toggle
+              const btn = document.getElementById('profileDropdownButton')
+              const menu = document.getElementById('profileDropdownMenu')
+              btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden')
+              })
+              document.addEventListener('click', function (e) {
+                if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                  menu.classList.add('hidden')
+                }
+              })
+            </script>
+          {% else %}
+            <a href="{% url 'login' %}" class="font-semibold text-xl hover:text-black">Login</a>
+            <a href="{% url 'signup' %}" class="font-semibold text-xl hover:text-black">Signup</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="container mx-auto px-4 py-6">
+      {% block content %}
+
+      {% endblock %}
+    </main>
   </body>
 </html>

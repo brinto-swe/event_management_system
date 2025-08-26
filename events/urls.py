@@ -1,34 +1,59 @@
 from django.urls import path
-from . import views
-from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
+from .views import (
+    EventListView, EventDetailView, EventCreateView, EventUpdateView, EventDeleteView,
+    RSVPCreateView, MyEventsView,
+    UserProfileView, UserProfileUpdateView,
+    CustomPasswordChangeView, CustomPasswordChangeDoneView,
+    CustomPasswordResetView, CustomPasswordResetDoneView,
+    CustomPasswordResetConfirmView, CustomPasswordResetCompleteView,
+    signup_view, activate_account, post_login_redirect, home_redirect,
+    admin_dashboard, organizer_dashboard, participant_dashboard,
+    category_create, category_delete, category_update, category_list
+)
 
 urlpatterns = [
-    # Auth
-    path('signup/', views.signup_view, name='signup'),
-    path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
-    path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('post-login-redirect/', views.post_login_redirect, name='post_login_redirect'),
+    # Home / Event list
+    path('', home_redirect, name='home'),
+    path('events/', EventListView.as_view(), name='event_list'),
 
-    # Dashboards
-    path('', views.home_redirect, name='home'),
-    path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
-    path('dashboard/organizer/', views.organizer_dashboard, name='organizer_dashboard'),
-    path('dashboard/participant/', views.participant_dashboard, name='participant_dashboard'),
+    # Event CRUD
+    path('event/<int:pk>/', EventDetailView.as_view(), name='event_detail'),
+    path('event/create/', EventCreateView.as_view(), name='event_create'),
+    path('event/<int:pk>/update/', EventUpdateView.as_view(), name='event_update'),
+    path('event/<int:pk>/delete/', EventDeleteView.as_view(), name='event_delete'),
 
-    # Events & Categories CRUD (RBAC enforced inside views)
-    path('events/', views.event_list, name='event_list'),
-    path('events/add/', views.event_create, name='event_add'),
-    path('events/<int:pk>/', views.event_detail, name='event_detail'),
-    path('events/<int:pk>/edit/', views.event_update, name='event_edit'),
-    path('events/<int:pk>/delete/', views.event_delete, name='event_delete'),
-
-    path('categories/', views.category_list, name='category_list'),
-    path('categories/add/', views.category_create, name='category_add'),
-    path('categories/<int:pk>/edit/', views.category_update, name='category_edit'),
-    path('categories/<int:pk>/delete/', views.category_delete, name='category_delete'),
+    # Categories CRUD (FBV)
+    path('categories/', category_list, name='category_list'),
+    path('categories/add/', category_create, name='category_add'),
+    path('categories/<int:pk>/edit/', category_update, name='category_edit'),
+    path('categories/<int:pk>/delete/', category_delete, name='category_delete'),
 
     # RSVP
-    path('events/<int:pk>/rsvp/', views.rsvp_event, name='rsvp_event'),
-    path('my-rsvps/', views.my_rsvps, name='my_rsvps'),
+    path('event/<int:pk>/rsvp/', RSVPCreateView.as_view(), name='event_rsvp'),
+    path('my-events/', MyEventsView.as_view(), name='my_events'),
+
+    # User Auth
+    path('signup/', signup_view, name='signup'),
+    path('activate/<uidb64>/<token>/', activate_account, name='activate'),
+    path('login/', LoginView.as_view(template_name="registration/login.html"), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('post-login-redirect/', post_login_redirect, name='post_login_redirect'),
+
+    # Profile
+    path('profile/', UserProfileView.as_view(), name='profile'),
+    path('profile/edit/', UserProfileUpdateView.as_view(), name='edit_profile'),
+
+    # Password Management
+    path('password/change/', CustomPasswordChangeView.as_view(), name='password_change'),
+    path('password/change/done/', CustomPasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('password/reset/', CustomPasswordResetView.as_view(template_name ="registration/password_reset.html"), name='password_reset'),
+    path('password/reset/done/', CustomPasswordResetDoneView.as_view(template_name ="registration/password_reset_done.html"), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(template_name ="registration/password_reset_confirm.html"), name='password_reset_confirm'),
+    path('reset/done/', CustomPasswordResetCompleteView.as_view(template_name ="registration/password_reset_complete.html"), name='password_reset_complete'),
+
+    # Dashboards
+    path('dashboard/admin/', admin_dashboard, name='admin_dashboard'),
+    path('dashboard/organizer/', organizer_dashboard, name='organizer_dashboard'),
+    path('dashboard/participant/', participant_dashboard, name='participant_dashboard'),
 ]
