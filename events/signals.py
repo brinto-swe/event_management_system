@@ -10,29 +10,52 @@ from django.conf import settings
 
 from .models import RSVP, CustomUser
 
+
 # Ensure Groups exist
 def ensure_groups():
     for name in ['Admin', 'Organizer', 'Participant']:
         Group.objects.get_or_create(name=name)
 
+
 @receiver(post_save, sender=CustomUser)
-def on_user_created_send_activation(sender, instance: User, created, **kwargs):
+def on_user_created_send_activation(sender, instance: CustomUser, created, **kwargs):
     ensure_groups()
+
     if created:
+        # Superuser/Staff এর জন্য ইমেইল পাঠানো লাগবে না
+        if instance.is_superuser or instance.is_staff:
+            return
+
         # Default role: Participant
         participant_group = Group.objects.get(name='Participant')
         instance.groups.add(participant_group)
 
+        # নতুন ইউজার by default inactive
         instance.is_active = False
         instance.save(update_fields=['is_active'])
-        
-        # Send activation email
+
+        # Activation mail পাঠানো
         uid = urlsafe_base64_encode(force_bytes(instance.pk))
         token = default_token_generator.make_token(instance)
-        activation_link = f"{getattr(settings, 'SITE_URL', 'http://localhost:8000')}{reverse('activate', args=[uid, token])}"
+        site_url = getattr(settings, "SITE_URL", "http://localhost:8000")
+        activation_link = f"{site_url}{reverse('activate', args=[uid, token])}"
+
         subject = "Activate your EventMS account"
-        message = f"Hi {instance.first_name or instance.username},\n\nPlease activate your account:\n{activation_link}\n\nThanks."
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [instance.email], fail_silently=False)
+        message = (
+            f"Hi {instance.first_name or instance.username},\n\n"
+            f"Please activate your account by clicking the link below:\n"
+            f"{activation_link}\n\n"
+            f"Thanks."
+        )
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [instance.email],
+            fail_silently=False,
+        )
+
 
 @receiver(post_save, sender=RSVP)
 def on_rsvp_send_email(sender, instance: RSVP, created, **kwargs):
@@ -45,4 +68,10 @@ def on_rsvp_send_email(sender, instance: RSVP, created, **kwargs):
             f"You have successfully RSVP’d to '{event.name}' on {event.date} at {event.time}.\n"
             f"Location: {event.location}\n\nSee you there!"
         )
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=True)
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=True,
+        )
