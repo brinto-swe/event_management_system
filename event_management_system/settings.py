@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'events',
-    'debug_toolbar'
+    'debug_toolbar',
+    "django.contrib.sites"
 ]
 
 MIDDLEWARE = [
@@ -79,7 +80,7 @@ WSGI_APPLICATION = 'event_management_system.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default='postgresql://eventms_db_nkl9_user:n59PHjFGs4kGYn7HHnbOZQ349pOqx53U@dpg-d2mjn8ogjchc73cnj8rg-a.oregon-postgres.render.com/eventms_db_nkl9',
+        default='postgresql://eventms_db_jp8r_user:2WaTgghCRkzA9EHEcVTU5APCfANW0jp0@dpg-d2mkte95pdvs738vehdg-a.oregon-postgres.render.com/eventms_db_jp8r',
         conn_max_age=600
     )
 }
